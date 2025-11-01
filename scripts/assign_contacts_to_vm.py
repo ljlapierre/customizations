@@ -16,22 +16,22 @@ class AssignContactVM(Script):
         scheduling_enabled = False
 
     # Main form
-    primary_owner = ObjectVar(label="Primary Owner", model=Contact)
-    secondary_owner = ObjectVar(label="Secondary Owner", model=Contact)
+    primary_contact = ObjectVar(label="Primary Owner", model=Contact)
+    secondary_contact = ObjectVar(label="Secondary Owner", model=Contact)
+    contact_role = ObjectVar(label="Contact Role", model=ContactRole)
     vm = ObjectVar(label="Virtual Machine", model=VirtualMachine)
 
     def run(self, data, commit):
 
-        # Get VM object type & owner role. Owner role must exist.
+        # Get VM object type
         vm_object_type = ObjectType.objects.get(model='virtualmachine')
-        contact_owner_role = ContactRole.objects.get(slug="owner")
 
         # Create contact assignments
         ownerPrimary = ContactAssignment(
             object_type=vm_object_type,
             object_id=data["vm"].id,
-            contact=data["primary_owner"],
-            role=contact_owner_role,
+            contact=data["primary_contact"],
+            role=contact_role,
             priority=ContactPriorityChoices.PRIORITY_PRIMARY,
         )
         ownerPrimary.full_clean()
@@ -40,8 +40,8 @@ class AssignContactVM(Script):
         ownerSecondary = ContactAssignment(
             object_type=vm_object_type,
             object_id=data["vm"].id,
-            contact=data["secondary_owner"],
-            role=contact_owner_role,
+            contact=data["secondary_contact"],
+            role=contact_role,
             priority=ContactPriorityChoices.PRIORITY_SECONDARY,
         )
         ownerSecondary.full_clean()
